@@ -1,5 +1,5 @@
 import User from "../models/User";
-import bcrypt from "bcrypt";
+import argon2 from "argon2";
 
 export const getJoin = (req, res) => res.render("join", { pageTitle: "Join" });
 
@@ -51,7 +51,7 @@ export const postLogin = async (req, res) => {
 	if (!user) {
 		return res.status(400).render("login", { pageTitle, errorMessage: "An account with this username does not exists." });
 	}
-	const ok = await bcrypt.compare(password, user.password);
+	const ok = await argon2.verify(user.password, password);
 	if (!ok) {
 		return res.status(400).render("login", { pageTitle, errorMessage: "Wrong password" });
 	}
