@@ -23,13 +23,17 @@ let controlsMovementTimeout = null;
 let volumeValue = 0.5;
 video.volume = volumeValue;
 
+const playOrPause = () => {
+	if (video.paused) {
+		video.play();
+	  } else {
+		video.pause();
+	  }
+	  playBtnIcon.classList = video.paused ? "fas fa-play" : "fas fa-pause";	
+};
+
 const handlePlayClick = (e) => {
-  if (video.paused) {
-    video.play();
-  } else {
-    video.pause();
-  }
-  playBtnIcon.classList = video.paused ? "fas fa-play" : "fas fa-pause";
+  playOrPause();
 };
 
 const handleMuteClick = (e) => {
@@ -109,17 +113,52 @@ const handleMouseMove = () => {
 	controlsMovementTimeout = setTimeout(hideControls, 3000);
 };
 
+const handleMouseMoveForControls = () => {
+	if (controlsTimeout) {
+		clearTimeout(controlsTimeout);
+		controlsTimeout = null;
+	}
+	if (controlsMovementTimeout) {
+		clearTimeout(controlsMovementTimeout);
+		controlsMovementTimeout = null;
+	}
+	videoControls.classList.add("showing");
+};
+
 const handleMouseLeave = () => {
 	controlsTimeout = setTimeout(hideControls, 3000);
 };
 
+const handleMouseLeaveForControls = () => {
+	controlsTimeout = setTimeout(hideControls, 3000);
+};
+
+const handleSpaceKey = (e) => {
+	console.log(e.code);
+	if (e.code === "Space") {
+		e.preventDefault();
+		playOrPause();
+	}
+};
+
+const handleScreenClick = () => {
+	playOrPause();
+};
+
 playBtn.addEventListener("click", handlePlayClick);
+document.addEventListener("keydown", handleSpaceKey);
+video.addEventListener("click", handleScreenClick);
+
 muteBtn.addEventListener("click", handleMuteClick);
 volumeRange.addEventListener("input", handleVolumeChange);
+
 video.addEventListener("loadeddata", handleLoadedMetaData);
 video.addEventListener("timeupdate", handleTimeUpdate);
 video.addEventListener("mousemove", handleMouseMove);
 video.addEventListener("mouseleave", handleMouseLeave);
 timeline.addEventListener("input", handleTimelineChange);
+videoControls.addEventListener("mousemove", handleMouseMoveForControls);
+videoControls.addEventListener("mouseleave", handleMouseLeaveForControls);
+
 fullScreenBtn.addEventListener("click", handleFullScreenClick);
 document.addEventListener("fullscreenchange", handleFullScreenEvent);
