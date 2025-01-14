@@ -146,7 +146,7 @@ const handleScreenClick = () => {
 };
 
 playBtn.addEventListener("click", handlePlayClick);
-document.addEventListener("keydown", handleSpaceKey);
+document.addEventListener("keyup", handleSpaceKey);
 video.addEventListener("click", handleScreenClick);
 
 muteBtn.addEventListener("click", handleMuteClick);
