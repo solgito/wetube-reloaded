@@ -1,5 +1,7 @@
 import User from "../models/User";
 import Video from "../models/Video";
+import Comment from "../models/Comment";
+import { async } from "regenerator-runtime";
 
 export const home = async (req, res) => {
 	try {
@@ -15,7 +17,7 @@ export const home = async (req, res) => {
 
 export const watch = async (req, res) => {
 	const { id } = req.params;
-	const video = await Video.findById(id).populate("owner");
+	const video = await Video.findById(id).populate("owner").populate("comments");
 	if (!video) {
 		return res.status(400).render("404", { pageTitle: "Video not found." });
 	}
@@ -43,11 +45,13 @@ export const postEdit = async (req, res) => {
 	const {
 		user: { _id },
 	} = req.session;
-	const video = await Video.exists({ _id: id });
+	const video = await Video.findById(id);
 	if (!video) {
 		return res.render("404", { pageTitle: "Video not found." });
 	}
 	if (String(video.owner) !== String(_id)) {
+		console.log(String(video.owner));
+		console.log(String(_id));
 		req.flash("error", "Not authorized");
 		return res.status(403).redirect("/");
 	}
@@ -129,4 +133,60 @@ export const registerView = async (req, res) => {
 	video.meta.views = video.meta.views + 1;
 	await video.save();
 	return res.sendStatus(200);
+};
+
+export const createComment = async (req, res) => {
+	const {
+		session: { user },
+		body: { text },
+		params: { id },
+	} = req;
+	const video = await Video.findById(id);
+	if (!video) {
+		return res.sendStatus(404);
+	}
+	const userFromDB = await User.findById(user._id);
+	if (!userFromDB) {
+		return res.sendStatus(404);
+	}
+	const comment = await Comment.create({
+		text,
+		owner: user._id,
+		video: id,
+	});
+	video.comments.push(comment._id);
+	video.save();
+	userFromDB.comments.push(comment._id);
+	userFromDB.save();
+
+	return res.status(201).json({ newCommentId: comment._id });
+};
+
+export const deleteComment = async (req, res) => {
+	const {
+		session: { user },
+		params: { id }
+	} = req;
+
+	const loggedInUser = await User.findById(user._id);
+	if (!loggedInUser) {
+		return res.sendStatus(404);
+	}
+	const comment = await Comment.findById(id);
+	if (!comment) {
+		return res.sendStatus(404);
+	}
+	if (String(comment.owner) !== String(loggedInUser._id)) {
+		return res.status(403).redirect("/");
+	}
+
+	await Comment.findByIdAndDelete(id);
+	await User.updateMany({ comments: id }, { $pull: { comments: id }});
+	await Video.updateMany({ comments: id }, { $pull: { comments: id }});
+	res.sendStatus(204);
+};
+
+export const getNoRecorder = (req, res) => {
+	req.flash("error", "Cannot record video. Maybe Not found camera.");
+	return res.redirect("/videos/upload");
 };

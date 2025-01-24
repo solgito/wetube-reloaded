@@ -1,6 +1,6 @@
 import express from "express";
 import morgan from "morgan";
-import flash from "express-flash";
+import flash from "connect-flash";
 import session from "express-session";
 import MongoStore from "connect-mongo";
 
@@ -19,6 +19,7 @@ app.set("views", process.cwd() + "/src/views");
 app.set("view engine", "pug");
 
 app.use(express.urlencoded({ extended: true }));
+app.use(express.json());
 app.use(session({
 	secret: process.env.COOKIE_SECRET,
 	resave: false,

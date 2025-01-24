@@ -134,7 +134,6 @@ const handleMouseLeaveForControls = () => {
 };
 
 const handleSpaceKey = (e) => {
-	console.log(e.code);
 	if (e.code === "Space") {
 		e.preventDefault();
 		playOrPause();

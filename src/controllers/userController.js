@@ -183,6 +183,7 @@ export const getEdit = (req, res) => {
 	}
 	return res.render("users/change-password", { pageTitle: "Change Password" });
   };
+  
   export const postChangePassword = async (req, res) => {
 	const {
 	  session: {
@@ -191,7 +192,7 @@ export const getEdit = (req, res) => {
 	  body: { oldPassword, newPassword, newPasswordConfirmation },
 	} = req;
 	const user = await User.findById(_id);
-	const ok = await bcrypt.compare(oldPassword, user.password);
+	const ok = await argon2.verify(user.password, oldPassword);
 	if (!ok) {
 	  return res.status(400).render("users/change-password", {
 		pageTitle: "Change Password",

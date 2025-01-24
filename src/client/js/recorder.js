@@ -62,28 +62,32 @@ const handleDownload = async () => {
 	actionBtn.disabled = false;
 	actionBtn.innerText = "Record Again";
 	actionBtn.addEventListener("click", handleStart);
-	// init();
+	init();
 };
 
 const handleStart = () => {
-	actionBtn.innerText = "Recording";
-	actionBtn.disabled = true;
-
-	actionBtn.removeEventListener("click", handleStart);
-
-	recorder = new MediaRecorder(stream, { mimeType: "video/webm" });
-	recorder.ondataavailable = (e) => {
-		videoFile = URL.createObjectURL(e.data);
-		video.srcObject = null;
-		video.src = videoFile;
-		video.loop = true;
-		video.play();
-		actionBtn.innerText = "Download";
-		actionBtn.disabled = false;
-		actionBtn.addEventListener("click", handleDownload);
-	};
-	recorder.start();
-	setTimeout(() => { recorder.stop(); }, 5000);
+	try {
+		actionBtn.innerText = "Recording";
+		actionBtn.disabled = true;
+	
+		actionBtn.removeEventListener("click", handleStart);
+	
+		recorder = new MediaRecorder(stream, { mimeType: "video/webm" });
+		recorder.ondataavailable = (e) => {
+			videoFile = URL.createObjectURL(e.data);
+			video.srcObject = null;
+			video.src = videoFile;
+			video.loop = true;
+			video.play();
+			actionBtn.innerText = "Download";
+			actionBtn.disabled = false;
+			actionBtn.addEventListener("click", handleDownload);
+		};
+		recorder.start();
+		setTimeout(() => { recorder.stop(); }, 5000);
+	} catch(e) {
+		window.location.href = "/videos/no-recorder";
+	}
 };
 
 const init = async () => {
