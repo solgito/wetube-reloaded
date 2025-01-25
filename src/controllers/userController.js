@@ -173,6 +173,7 @@ export const getEdit = (req, res) => {
 	  { new: true }
 	);
 	req.session.user = updatedUser;
+	req.flash("info", "Success changed.");
 	return res.redirect("/users/edit");
   };
   

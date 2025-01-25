@@ -36,4 +36,17 @@ app.use("/users", userRouter);
 app.use("/videos", videoRouter);
 app.use("/api", apiRouter);
 
+app.use((err, req, res, next) => {
+	console.error(`[ERROR] ${err.message}`);
+	console.error(`[STACK TRACE]:\n${err.stack}`);
+	console.error(`[REQUEST INFO]: Method=${req.method}, URL=${req.originalUrl}, IP=${req.ip}`);
+
+	// res.status(err.status || 500).json({
+	//   success: false,
+	//   message: err.message || 'Internal Server Error',
+	// });
+	req.flash("error", err.message || "Internal Server Error.");
+	res.status(err.status || 500).redirect("/");
+  });
+
 export default app;

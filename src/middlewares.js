@@ -7,7 +7,8 @@ const s3Client = new S3Client({
 	credentials: {
 		accessKeyId: process.env.AWS_KEY,
 		secretAccessKey: process.env.AWS_SECRET,
-	}
+	},
+	logger: console,
 });
 
 const s3AvatarStorage = multerS3({
@@ -17,6 +18,7 @@ const s3AvatarStorage = multerS3({
 	key: function (req, file, cb) {
 	  cb(null, `avatars/${req.session.user._id}/${Date.now().toString()}`);
 	},
+	contentType: multerS3.AUTO_CONTENT_TYPE
   });
 
   const s3VideoStorage = multerS3({
@@ -57,12 +59,12 @@ export const protectorMiddleware = (req, res, next) => {
   export const avatarUpload = multer({
 	limits: {
 	fieldSize: 3000000,
-},
-storage: s3AvatarStorage,
+	},
+	storage: s3AvatarStorage,
 });
   export const videoUpload = multer({
 	limits: {
-	fileSize: 10000000,
-  },
-  storage: s3VideoStorage,
+	fileSize: 15000000,
+	},
+	storage: s3VideoStorage,
 });
