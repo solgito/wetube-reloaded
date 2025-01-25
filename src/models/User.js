@@ -4,7 +4,7 @@ import argon2, { argon2id } from "argon2";
 const userSchema = new mongoose.Schema({
 	email: { type: String, required: true, unique: true },
 	socialOnly: { type: Boolean, default: false },
-	avatarUrl: String,
+	avatarUrl: { type: String, default: "" },
 	username: { type: String, required: true, unique: true },
 	password: { type: String },
 	email: { type: String, required: true },
